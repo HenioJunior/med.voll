@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Medico {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String nome;
     private String email;
     private String crm;
@@ -31,7 +31,15 @@ public class Medico {
         this.endereco = endereco;
     }
 
-    public long getId() {
+    public Medico(DadosCadastroMedico dados) {
+        this.nome = dados.nome();
+        this.email = dados.email();
+        this.crm = dados.crm();
+        this.especialidade = dados.especialidade();
+        this.endereco = new Endereco(dados.endereco());
+    }
+
+    public Long getId() {
         return id;
     }
 
