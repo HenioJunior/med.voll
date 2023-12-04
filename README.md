@@ -123,3 +123,53 @@ No primeiro método criado, precisamos devolver um objeto do tipo Collection cha
     }
 ```
 
+### Gerando token JWT
+
+Criação de uma nova classe(TokenService) , para que possamos isolar o token, uma boa prática em programação.</br>
+
+Ela fará a geração, a validação e o que mais estiver relacionado aos tokens. No arquivo "TokenService.java", passaremos a anotação @Service, já que a classe representará um serviço.</br>
+
+Criação do método `gerarToken`. Dentro dela, usaremos a biblioteca JWT.</br>
+
+Vamos gerar a validade chamando o método .withExpiresAt(). passando como parâmetro dataExpiracao().
+
+```java
+@Service
+public class TokenService {
+
+    public String gerarToken(Usuario usuario) { 
+        try {
+            var algoritmo = Algorithm.HMAC256("12345678");
+            return JWT.create()
+                .withIssuer("API Voll.med")
+                .withSubject(usuario.getLogin())
+                .withExpiresAt(dataExpiracao())
+                .sign(algoritmo);
+        } catch (JWTCreationException exception){
+            throw new RuntimeException("erro ao gerrar token jwt", exception);
+        }        
+    }
+
+    private Instant dataExpiracao() {
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+    }
+}
+```
+
+#### Em AutenticacaoController
+
+Injetaremos o `TokenService tokenService` para gerar o token;</br>
+O token será retornado no corpo da mensagem `Response.Entity.ok(tokenService.gerarToken((usuario) authentication.getPrincipal()))`;
+
+```java
+@Autowired
+private TokenService tokenService;
+
+@PostMapping
+public ResponseEntity efetuarLogin(@RequestBody @Valid DadosAutenticacao dados) {
+    var token = new UsernamePasswordAuthenticationToken(dados.login(), dados.senha());
+    var authentication :Authentication = manager.authenticate(token);
+
+    return ResponseEntity.ok(tokenService.gerarToken((Usuario) authentication.getPrincipal()));
+}
+```
