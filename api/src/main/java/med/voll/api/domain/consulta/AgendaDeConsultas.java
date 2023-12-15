@@ -2,7 +2,6 @@ package med.voll.api.domain.consulta;
 
 import med.voll.api.domain.ValidacaoException;
 import med.voll.api.domain.consulta.validacoes.ValidadorAgendamentoDeConsulta;
-import med.voll.api.domain.medico.Especialidade;
 import med.voll.api.domain.medico.Medico;
 import med.voll.api.domain.medico.MedicoRepository;
 import med.voll.api.domain.paciente.PacienteRepository;
@@ -23,9 +22,10 @@ public class AgendaDeConsultas {
     @Autowired
     private PacienteRepository pacienteRepository;
 
+    @Autowired
     private List<ValidadorAgendamentoDeConsulta> validadores;
 
-    public void agendar(DadosAgendamentoConsulta dados) {
+    public DadosDetalhamentoConsulta agendar(DadosAgendamentoConsulta dados) {
         if(dados.idMedico() != null && !medicoRepository.existsById(dados.idMedico())) {
             throw new ValidacaoException("O id do médico informado não existe");
         }
@@ -40,6 +40,8 @@ public class AgendaDeConsultas {
         var paciente = pacienteRepository.getReferenceById(dados.idPaciente());
         var consulta = new Consulta(null, medico, paciente, dados.data());
         consultaRepository.save(consulta);
+
+        return new DadosDetalhamentoConsulta(consulta);
     }
 
     private Medico escolherMedico(DadosAgendamentoConsulta dados) {
@@ -51,6 +53,6 @@ public class AgendaDeConsultas {
             throw new ValidacaoException("Especialidade é obrigatória quando médico não for escolhido");
         }
 
-        return pacienteRepository.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
+        return medicoRepository.escolherMedicoAleatorioLivreNaData(dados.especialidade(), dados.data());
     }
 }
