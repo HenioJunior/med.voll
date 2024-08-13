@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  mysqlsrv:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: "P@ssw0rd"
+      MYSQL_DATABASE: "cdcdb"
+    ports:
+      - "3306:3306"  
+    networks:
+      - mysql-compose-network
+ 
+networks: 
+  mysql-compose-network:
+    driver: bridge
