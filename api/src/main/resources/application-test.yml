@@ -1,0 +1,8 @@
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db_vollmed_test?useTimezone=true&serverTimezone=America/Sao_Paulo
+
